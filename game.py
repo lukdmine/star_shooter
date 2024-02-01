@@ -5,7 +5,6 @@ import world as w
 
 class Game:
     def __init__(self):
-        pg.init()
         self.window = pg.display.set_mode((s.WIDTH, s.HEIGHT))
         self.world = w.World(self.window)
         self.playing = False
