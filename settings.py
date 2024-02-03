@@ -1,6 +1,11 @@
 FPS = 60
+# pygame window settings
 WIDTH = 640
 HEIGHT = 480
+
+# world settings
+W_WIDTH = 1000
+W_HEIGHT = 1000
 
 # Colors
 WHITE = (255, 255, 255)
