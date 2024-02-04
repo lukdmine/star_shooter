@@ -7,6 +7,8 @@ BASE_IMAGE_PATH = 'data/images/'
 def load_image(path: str, size: tuple[int, int] = None) -> pygame.Surface:
     """Load an image from the given path and resize it if needed."""
     image = pygame.image.load(BASE_IMAGE_PATH + path)
+    if size:
+        image = pygame.transform.scale(image, size)
     image.set_colorkey((0, 0, 0))
     return image
 

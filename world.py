@@ -1,63 +1,47 @@
 import pygame as pg
-import settings as s
-import entity as e
-import player as p
+import constants as s
 import network as n
+import client_entity as p
+from time import perf_counter
 import utils as u
 
 
 # a class which stores the game world
 class World:
-    def __init__(self, window: pg.Surface, network: 'n.Network'):
-        self.player = p.Player()
+    def __init__(self):
+        # size not needed - the world is infinite
+        self.network = n.Network()
+        # TODO: get the initial player position from the server
+        self.client_entity = p.PlayerSpaceShip()
         self.projectiles = pg.sprite.Group()
-        self.enemies = pg.sprite.Group()
-        self.window = window
+        self.enemy_entities = pg.sprite.Group()
+        self.window = pg.display.set_mode((s.WIDTH, s.HEIGHT))
         self.clock = pg.time.Clock()
-        self.mouse_pos = (0, 0)
-        self.size = (s.W_WIDTH, s.W_HEIGHT)
-        self.network = network
-        self.enemy_position = 0, 0
+        self.mouse_pos = 0, 0
+        self.last_time = perf_counter()
 
     def tick(self):
-        self.mouse_pos = pg.mouse.get_pos()
+        dt = self.get_delta_time()
+        # LOCAL CLIENT GAME LOOP
         self.event_handler()
         self.clock.tick(s.FPS)
-        self.update()
+        self.update(dt)
         self.draw()
         self.send_player_data()
 
-
-    def update(self):
-        self.player.update(self.mouse_pos)
-        for projectile in self.projectiles:
-            projectile.update(self.player)
-        for enemy in self.enemies:
-            enemy.update(self.player)
+    def update(self, delta_time):
+        self.mouse_pos = pg.mouse.get_pos()
+        # TODO: update the projectiles, enemies and player
+        # TODO: if the enemy or projectile is too far, remove it from the storage
+        pass
 
     def draw(self):
-        # REMOVE AFTER TESTING
-        self.create_enemy()
-
-        self.window.fill(s.BLACK)
-        self.player.update(self.mouse_pos)
-        self.player.draw(self.window)
-        self.projectiles.draw(self.window)
-        self.enemies.draw(self.window)
-        pg.display.update()
+        # TODO: draw the player, enemies and projectiles
+        pg.display.update()  # function to update the screen
 
     def send_player_data(self):
-        print(self.player.actual_pos)
-        prep_pos = u.pack_player_data(self.player.actual_pos)
-        # sending the player position and receiving the enemy position
-        self.enemy_position = u.unpack_player_data(self.network.send(prep_pos))
-
-    def create_enemy(self):
-        enemy = e.Enemy(self.enemy_position, (0, 0))
-        # REMOVE AFTER TESTING
-        self.enemies.empty()
-
-        self.enemies.add(enemy)
+        # TODO: send the player data to the server AND receive the data from the server
+        pass
 
     def event_handler(self):
         for event in pg.event.get():
@@ -71,9 +55,15 @@ class World:
                     pg.quit()
                     quit()
                 if event.key == pg.K_SPACE:
-                    # propel the player spaceship
-                    self.player.spaceship.propel()
+                    # TODO: propel the player
+                    pass
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    # shoot a projectile
+                    # TODO shoot a projectile
                     pass
+
+    def get_delta_time(self):
+        dt = perf_counter() - self.last_time
+        dt *= s.FPS
+        self.last_time = perf_counter()
+        return dt
