@@ -1,4 +1,7 @@
 import os
+import client_entity as p
+import projectile as pr
+import pygame as pg
 
 import pygame
 
@@ -21,9 +24,27 @@ def load_images(path: str, size: tuple[int, int] = None) -> list[pygame.Surface]
     return images
 
 
-def pack_player_data(pos: tuple[int, int]) -> str:
-    return f'{pos[0]},{pos[1]}'
+def pack_player_data(client_entity: p.PlayerSpaceShip, projectile: pr.Projectile = None) -> str:
+    """Pack the player data into a string."""
+    position = f'{int(client_entity.position.x)},{int(client_entity.position.y)}'
+    heading = str(client_entity.heading)
+    projectile_data = 'f'
+    if projectile:
+        projectile_data = f't,{int(projectile.position.x)},{int(projectile.position.y)},{int(projectile.speed.x)},{int(projectile.speed.y)}'
+    return f'{position}|{heading}|{projectile_data}'
 
 
-def unpack_player_data(data: str) -> tuple[int, int]:
-    return tuple(map(int, data.split(',')))
+def unpack_player_data(data: str) -> tuple[pg.Vector2, int, tuple[pg.Vector2, pg.Vector2] | None]:
+    """Unpack the player data from a string."""
+    position, heading, projectile_data = data.split('|')
+    position = pg.Vector2(tuple(map(int, position.split(','))))
+    heading = int(heading)
+
+    if projectile_data[0] == 'f':
+        return position, heading, None
+
+    projectile_data = projectile_data.split(',')
+    position = pg.Vector2(tuple(map(int, projectile_data[1:3])))
+    heading = int(projectile_data[3])
+    return position, heading, projectile_data
+

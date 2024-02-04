@@ -33,10 +33,17 @@ class World:
         self.mouse_pos = pg.mouse.get_pos()
         # TODO: update the projectiles, enemies and player
         # TODO: if the enemy or projectile is too far, remove it from the storage
-        pass
+        self.projectiles.update(delta_time, self.client_entity.position)
+        self.client_entity.update(delta_time, self.mouse_pos)
+        # TODO: update the enemy positions
 
     def draw(self):
-        # TODO: draw the player, enemies and projectiles
+        self.window.fill(s.BLACK)
+
+        self.client_entity.draw(self.window)
+        self.enemy_entities.draw(self.window)
+        self.projectiles.draw(self.window)
+
         pg.display.update()  # function to update the screen
 
     def send_player_data(self):
@@ -55,12 +62,13 @@ class World:
                     pg.quit()
                     quit()
                 if event.key == pg.K_SPACE:
-                    # TODO: propel the player
-                    pass
+                    self.client_entity.propel()
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    # TODO shoot a projectile
-                    pass
+                    new_projectile = self.client_entity.shoot()
+                    # TODO: send the projectile data to the server
+                    self.projectiles.add(new_projectile)
+
 
     def get_delta_time(self):
         dt = perf_counter() - self.last_time

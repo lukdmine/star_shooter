@@ -25,6 +25,7 @@ print('waiting for connection')
 # server loop
 def server_loop():
     while True:
+        print('server loop running')
         # TODO: update the game world
         # TODO: the time between the updates should be constant and equal to the client's FPS
         # TODO: update projectile positions and check for collisions
@@ -33,7 +34,8 @@ def server_loop():
 
 # player connection function
 def threaded_client(conn, player_id: int) -> None:
-    # sending the player id to the client
+    # TODO: initialize the player in storage
+    # sending the initial player position to the client
     # conn.send(str.encode(u.pack_player_data(# TODO: player position from storage)))
     reply = ''
     while True:
