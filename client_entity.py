@@ -2,11 +2,12 @@ import pygame as pg
 import constants as s
 import utils as u
 import projectile as p
+import enemy_entity as e
 
 
 class PlayerSpaceShip(pg.sprite.Sprite):
-    def __init__(self, init_pos: tuple[int, int] = (s.WIDTH // 2, s.HEIGHT // 2),
-                 init_speed: tuple[int, int] = pg.Vector2(0, 0),
+    def __init__(self, init_pos: pg.Vector2 = pg.Vector2(s.WIN_WIDTH // 2, s.WIN_HEIGHT // 2),
+                 init_speed: pg.Vector2 = pg.Vector2(0, 0),
                  init_hp: int = s.PLAYER_HP, init_fuel: int = s.PLAYER_FUEL):
         pg.sprite.Sprite.__init__(self)
         # game attributes
@@ -26,7 +27,8 @@ class PlayerSpaceShip(pg.sprite.Sprite):
         # texture
         self.image = u.load_image('player.png', s.PLAYER_SIZE)
         self.rect = self.image.get_rect()
-        self.rect.center = init_pos
+        # window position (center of the window - remaining the same)
+        self.rect.center = pg.Vector2(s.WIN_WIDTH // 2, s.WIN_HEIGHT // 2)
 
     def update(self, delta_time, mouse_pos):
         window_position = pg.Vector2(self.rect.center)
@@ -42,8 +44,27 @@ class PlayerSpaceShip(pg.sprite.Sprite):
 
     def propel(self):
         # add the engine force to the speed based on the heading
-        self.speed = self.speed + pg.math.Vector2(0, self.engine_force).rotate(self.heading)
+        speed_delta = pg.math.Vector2(self.engine_force, 0).rotate(self.heading)
+        # pygame y axis is inverted
+        speed_delta = pg.Vector2(speed_delta.x, -speed_delta.y)
+        new_speed = self.speed + speed_delta
+        if new_speed.length() <= s.MAX_SPEED:
+            self.speed = new_speed
+        else:
+            self.speed = new_speed.normalize() * s.MAX_SPEED
 
     def shoot(self) -> p.Projectile:
         speed_vector = pg.Vector2(self.projectile_velocity, 0).rotate(self.heading)
+        # pygame y axis is inverted
+        speed_vector = pg.Vector2(speed_vector.x, -speed_vector.y)
         return p.Projectile(self.position, speed_vector, 'player')
+
+    def transform_to_server_player(self):
+        return ServerPlayer(self.position, self.hp, self.heading)
+
+
+class ServerPlayer:
+    def __init__(self, init_pos: pg.Vector2, hp: int, heading: int):
+        self.hp = hp
+        self.heading = heading
+        self.position = init_pos

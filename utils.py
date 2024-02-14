@@ -24,7 +24,7 @@ def load_images(path: str, size: tuple[int, int] = None) -> list[pygame.Surface]
     return images
 
 
-def pack_player_data(client_entity: p.PlayerSpaceShip, projectile: pr.Projectile = None) -> str:
+def pack_player_data(client_entity: 'p.PlayerSpaceShip', projectile: pr.Projectile = None) -> str:
     """Pack the player data into a string."""
     position = f'{int(client_entity.position.x)},{int(client_entity.position.y)}'
     heading = str(client_entity.heading)

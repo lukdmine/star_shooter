@@ -8,8 +8,10 @@ class Network:
         self.server = '127.0.0.1'
         self.port = 5555
         self.addr = (self.server, self.port)
-        self.id = self.connect()
-        print(self.id)
+        self.init_client_pos = [num for num in map(int, self.connect().split(','))]
+
+    def get_init_client_pos(self):
+        return self.init_client_pos
 
     def connect(self):
         try:
@@ -18,9 +20,9 @@ class Network:
         except:
             pass
 
-    def send(self, data: str):
+    def send(self, data: bytes):
         try:
-            self.client.send(str.encode(data))
-            return self.client.recv(2048).decode()
+            self.client.send(data)
+            return self.client.recv(4096)
         except socket.error as e:
             print(e)
